@@ -40,25 +40,3 @@ lib/
   webgl.ts              Render-target helpers for the liquid background
 public/projects/<slug>/ Project images (cover, card, gallery)
 ```
-
-## Editing content
-
-All copy lives in [lib/content.ts](lib/content.ts), so content changes never touch layout code. Search for `TODO` there before shipping.
-
-To add a project:
-
-1. Put its images in `public/projects/<slug>/`: `cover.webp`, `card.webp` (the work carousel title card) and numbered gallery shots (`01.webp`, `02.webp`, …).
-2. Add an entry for `<slug>` in [lib/project-media.json](lib/project-media.json) with each image's `src`, `width` and `height`.
-3. Add a `Project` to the `projects` array in `lib/content.ts`, spreading `...withMedia("<slug>")` for the images.
-
-The case study is then available at `/work/<slug>`.
-
-## How the case study routes work
-
-Clicking a project from inside the site opens its case study in a bottom sheet over the current page, via the intercepting route `app/@sheet/(.)work/[slug]`. Visiting `/work/<slug>` directly, or reloading, renders the full page from `app/work/[slug]` instead.
-
-## Notes
-
-- This project uses Next.js 16, whose APIs and conventions differ from earlier versions. Check `node_modules/next/dist/docs/` before changing routing or data fetching. See [AGENTS.md](AGENTS.md).
-- The liquid background falls back to no effect on GPUs that can't render into half-float targets.
-- Bump `iteration` in `lib/content.ts` when the design changes; it's shown at the foot of the sidebar.
