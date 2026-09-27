@@ -1,0 +1,9 @@
+# Netlify auto-detects Next.js and applies its OpenNext runtime
+# (@netlify/plugin-nextjs), so the plugin doesn't need to be pinned here.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
