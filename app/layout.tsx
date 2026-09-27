@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Zalando_Sans_Expanded } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Cursor } from "./_components/cursor";
 import { Header } from "./_components/header";
+import { LiquidCanvas } from "./_components/liquid-canvas";
 import { SmoothScroll } from "./_components/smooth-scroll";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
-const zalando = Zalando_Sans_Expanded({
-  variable: "--font-zalando",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
@@ -23,7 +24,7 @@ const markJs = "document.documentElement.classList.add('js')";
 
 export default function RootLayout({ children, sheet }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${zalando.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${jakarta.variable} antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: markJs }} />
       </head>
@@ -32,6 +33,7 @@ export default function RootLayout({ children, sheet }: LayoutProps<"/">) {
         <Header />
         {children}
         {sheet}
+        <LiquidCanvas />
         <Cursor />
       </body>
     </html>

@@ -1,27 +1,13 @@
-import { ViewTransition } from "react";
+import { TechTitle } from "./tech-title";
 
-// Every page's main word shares one transition name, so navigating morphs the
-// old word into the new one instead of wiping it away with the page.
-export function TitleMorph({ children }: { children: React.ReactNode }) {
+// The huge word bleeding off the top-left corner, as in the Figma frames
+// (its text box sits 76px above the top of a 1440 frame, 47px in), drawn by
+// Tech Text (see TechTitle). It travels with its page in the transition.
+export function PageTitle({ children }: { children: string }) {
   return (
-    <ViewTransition name="page-title" share="title-morph" default="none">
-      {children}
-    </ViewTransition>
-  );
-}
-
-// The big grey word pinned to the bottom-left corner, as in the Figma frames.
-export function PageTitle({ children, count }: { children: string; count?: number }) {
-  return (
-    <TitleMorph>
-      <h1 className="page-title pointer-events-none mt-24 w-fit pb-10 md:fixed md:bottom-10 md:left-(--gutter) md:mt-0 md:pb-0">
-        <span data-split="chars" className="inline-block">
-          {children}
-        </span>
-        {count !== undefined && (
-          <sup className="ml-2 align-top text-[0.18em] tracking-normal">{String(count).padStart(2, "0")}</sup>
-        )}
-      </h1>
-    </TitleMorph>
+    <h1 className="display mt-[-5.28vw] w-fit pl-[3.1vw]">
+      <span className="sr-only">{children}</span>
+      <TechTitle text={children} />
+    </h1>
   );
 }

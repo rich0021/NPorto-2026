@@ -9,8 +9,53 @@ export const profile = {
   lastName: "muttaqin",
   fullName: "Muhammad Naufal Muttaqin",
   timeZone: "Asia/Jakarta",
-  email: "", // TODO: add your email to show it on the contact page
+  email: "naufalmuttaqin022@gmail.com",
 };
+
+// Which iteration of the site this is, shown at the foot of the sidebar.
+// Bump it when the design changes.
+export const iteration = "v1";
+
+// The three lines the home page scrolls through under the name.
+export const taglines = ["shipping full-stack things from Indonesia", "problem to product", "concept to code"];
+
+// Home, first line: the layers of the stack, bottom to top ("from a database
+// schema all the way to the button someone taps").
+export const stackLayers = [
+  { layer: "database schema", tech: "prisma, postgresql, mysql" },
+  { layer: "backend", tech: "node.js, nestjs, adonisjs, laravel" },
+  { layer: "plumbing", tech: "docker, auth, pipelines" },
+  { layer: "frontend", tech: "react, vue, next.js" },
+  { layer: "the button someone taps", tech: "web, flutter" },
+];
+
+// Home, second line: problems that became products.
+export const problemsToProducts = [
+  { problem: "running livestock records across many farms", product: "ternusa.id" },
+  { problem: "screening job candidates before a human has to", product: "bintang" },
+  { problem: "tracking gold through a manufacturing floor", product: "emas app" },
+];
+
+// The about page bio, word for word from the Figma "about" frame, as four
+// chapters for the page's index. [text](/path) marks a link to a case study.
+export const bio = [
+  {
+    label: "now",
+    text: "i'm naufal, a full-stack developer based in bandung, indonesia. right now i split my time between building production software at [disco frog studio](/work/disco-frog-studio) and finishing my degree in informatics engineering at universitas teknologi bandung, which usually means bouncing between client work and a lecture hall on the same afternoon. it's not always tidy, but it's taught me more about actually shipping software than either half would on its own.",
+  },
+  {
+    label: "stack",
+    text: "most of what i build lives across the full stack: react and vue on the frontend, node.js, adonisjs, nestjs, and laravel on the backend, flutter when something needs to run on a phone. i've never been someone who sticks to one layer. i like following a feature from a database schema all the way to the button someone taps, and i especially like the parts of the job most people avoid: deployment pipelines, docker, auth, the invisible plumbing that decides whether a product actually stays up.",
+  },
+  {
+    label: "lately",
+    text: "lately that's meant [ternusa.id](/work/ternusa), a multi-tenant saas platform for livestock management that i've been building on nestjs, prisma, and next.js, alongside a flutter app for the field. and [bintang](/work/bintang-bot), a whatsapp bot that uses ai to screen job candidates before a human ever has to, which sounds simple until you've spent a week arguing with a language model about why it keeps inventing its own interview questions.",
+  },
+  {
+    label: "off the clock",
+    text: "outside work i'm usually gaming, playing volleyball, or out on my bike. my all time favorites are the red dead redemption series and the kingdom come: deliverance series, games i can replay long after i've finished them. long term, i'd like to end up making games myself, ideally at a real studio working in unreal engine, with everything i'm learning about ai as something i keep building alongside that rather than instead of it.",
+  },
+];
 
 export type Media = { src: string; width: number; height: number };
 
@@ -24,14 +69,18 @@ export type Project = {
   url?: string;
   cover?: Media;
   gallery: Media[];
+  // The work carousel's card: a plain #222 box with the name and category.
+  card?: Media;
 };
 
 // Covers and screenshots were pulled from the old portfolio
-// (muttaqin.is-a.dev/project.json) into public/projects/<slug>/.
-const shots = media as Record<string, { cover: Media | null; gallery: Media[] }>;
+// (muttaqin.is-a.dev/project.json) into public/projects/<slug>/; each card.webp
+// there is a rendered title card for the work carousel.
+const shots = media as Record<string, { cover: Media | null; gallery: Media[]; card?: Media }>;
 const withMedia = (slug: string) => ({
   cover: shots[slug]?.cover ?? undefined,
   gallery: shots[slug]?.gallery ?? [],
+  card: shots[slug]?.card,
 });
 
 export const projects: Project[] = [

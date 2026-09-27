@@ -59,7 +59,8 @@ export function PageMotion({ children, className }: { children: React.ReactNode;
         gsap.fromTo(
           el,
           { autoAlpha: 0, y: 40 },
-          { autoAlpha: 1, y: 0, duration: 1.2, ease: "expo.out", delay: delay(el), scrollTrigger: trigger(el) },
+          // clearProps: a leftover transform would isolate blend modes inside (the work labels).
+          { autoAlpha: 1, y: 0, duration: 1.2, ease: "expo.out", delay: delay(el), scrollTrigger: trigger(el), clearProps: "transform" },
         );
       });
 

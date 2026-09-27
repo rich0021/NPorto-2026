@@ -1,24 +1,25 @@
 import Image from "next/image";
-import Link from "next/link";
 import { projects, type Media, type Project } from "@/lib/content";
 import { Magnetic } from "./magnetic";
 import { PageMotion } from "./page-motion";
-import { TitleMorph } from "./page-title";
 import { ProjectFrame } from "./project-frame";
 import { TransitionLink } from "./transition-link";
 
 // A project case study in the Humaan layout: a sticky column with the story on
 // the left, a gallery of screenshot panels on the right, the next project to
-// finish. Renders both as a full page and inside the bottom sheet; in the
-// sheet the shared-element morphs are off, because the card and page word
-// they would pair with are still on the page behind it.
+// finish (full page only). Renders both as a full page and inside the bottom
+// sheet; in the sheet the shared-element morphs are off, because the card
+// they would pair with is still on the page behind it.
 export function CaseStudy({ project, inSheet = false }: { project: Project; inSheet?: boolean }) {
   const index = projects.indexOf(project);
   const next = projects[(index + 1) % projects.length];
   const count = (n: number) => String(n).padStart(2, "0");
 
   const title = (
-    <h1 data-split="chars" className="mt-8 text-[clamp(32px,3.2vw,48px)] leading-[0.95] tracking-[-0.02em]">
+    <h1
+      data-split="chars"
+      className={`text-[clamp(32px,3.2vw,48px)] leading-[0.95] tracking-[-0.02em] ${inSheet ? "" : "mt-8"}`}
+    >
       {project.name}
     </h1>
   );
@@ -26,19 +27,27 @@ export function CaseStudy({ project, inSheet = false }: { project: Project; inSh
   return (
     <PageMotion>
       <div
-        className={`shell grid gap-12 pb-[clamp(80px,10vw,160px)] lg:grid-cols-[minmax(0,4fr)_minmax(0,9fr)] lg:gap-[clamp(32px,4vw,64px)] ${
-          inSheet ? "pt-2" : "pt-28"
+        // In the sheet, Humaan's padding: the gallery 30px in from the sheet's
+        // top and right, the story 60px from its left and a step lower, in
+        // columns of 390 : 834 with a 65px gap (at 1440).
+        className={`grid gap-12 pb-[clamp(80px,10vw,160px)] ${
+          inSheet
+            ? "sheet-pad lg:grid-cols-[minmax(0,390fr)_minmax(0,834fr)] lg:gap-[clamp(32px,4.5vw,65px)]"
+            : "shell pt-28 lg:grid-cols-[minmax(0,4fr)_minmax(0,9fr)] lg:gap-[clamp(32px,4vw,64px)]"
         }`}
       >
-        <aside className={`self-start lg:sticky ${inSheet ? "lg:top-10" : "lg:top-28"}`}>
-          <div className="flex items-end justify-between gap-4">
-            <ProjectFrame project={project} size="sm" preload morph={!inSheet} />
-            <p data-reveal className="text-sm text-fg/55 tabular-nums">
-              {count(index + 1)} / {count(projects.length)}
-            </p>
-          </div>
+        <aside className={`self-start lg:sticky ${inSheet ? "lg:top-10 lg:pt-(--sheet-pad)" : "lg:top-28"}`}>
+          {/* The sheet opens straight on the title, like Humaan's. */}
+          {!inSheet && (
+            <div className="flex items-end justify-between gap-4">
+              <ProjectFrame project={project} size="sm" preload morph />
+              <p data-reveal className="text-sm text-fg/55 tabular-nums">
+                {count(index + 1)} / {count(projects.length)}
+              </p>
+            </div>
+          )}
 
-          {inSheet ? title : <TitleMorph>{title}</TitleMorph>}
+          {title}
 
           <div data-reveal data-delay="0.2" className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
             {project.url && (
@@ -80,7 +89,8 @@ export function CaseStudy({ project, inSheet = false }: { project: Project; inSh
         <Gallery project={project} />
       </div>
 
-      <UpNext project={next} inSheet={inSheet} />
+      {/* The sheet ends with the story; only the full page leads on. */}
+      {!inSheet && <UpNext project={next} />}
     </PageMotion>
   );
 }
@@ -128,7 +138,8 @@ function Panel({ shot, wide, dark, name, index }: { shot: Media; wide: boolean; 
         dark ? "bg-fg" : "bg-panel"
       }`}
     >
-      <div className="absolute inset-[7%] flex items-center justify-center">
+      {/* Drifts against the scroll inside its panel; the 7% inset leaves it room. */}
+      <div data-parallax="0.06" className="absolute inset-[7%] flex items-center justify-center">
         <Image
           src={shot.src}
           width={shot.width}
@@ -143,7 +154,7 @@ function Panel({ shot, wide, dark, name, index }: { shot: Media; wide: boolean; 
   );
 }
 
-function UpNext({ project, inSheet }: { project: Project; inSheet: boolean }) {
+function UpNext({ project }: { project: Project }) {
   const href = `/work/${project.slug}`;
   const card = (
     <>
@@ -172,16 +183,9 @@ function UpNext({ project, inSheet }: { project: Project; inSheet: boolean }) {
       <p data-reveal data-scroll className="border-t border-frame pt-6 text-sm text-fg/55">
         up next
       </p>
-      {inSheet ? (
-        // Swap the sheet's project in place, so closing still returns to where you were.
-        <Link href={href} replace scroll={false} data-cursor="next" className="up-next group mt-6 block">
-          {card}
-        </Link>
-      ) : (
-        <TransitionLink href={href} data-cursor="next" className="up-next group mt-6 block">
-          {card}
-        </TransitionLink>
-      )}
+      <TransitionLink href={href} data-cursor="next" className="up-next group mt-6 block">
+        {card}
+      </TransitionLink>
     </section>
   );
 }

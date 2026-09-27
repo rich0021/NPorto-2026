@@ -46,7 +46,12 @@
         "width": 1878,
         "height": 876
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/spectra-web/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "spectra-mobile": {
     "cover": {
@@ -80,7 +85,12 @@
         "width": 720,
         "height": 1612
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/spectra-mobile/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "e-ledger": {
     "cover": {
@@ -109,7 +119,12 @@
         "width": 1884,
         "height": 882
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/e-ledger/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "emas-app": {
     "cover": {
@@ -138,7 +153,12 @@
         "width": 1881,
         "height": 874
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/emas-app/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "disco-frog-studio": {
     "cover": {
@@ -187,7 +207,12 @@
         "width": 1885,
         "height": 882
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/disco-frog-studio/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "lestari-osean-indonesia": {
     "cover": {
@@ -236,7 +261,12 @@
         "width": 1876,
         "height": 868
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/lestari-osean-indonesia/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "bintang-manunggal-pratama": {
     "cover": {
@@ -285,7 +315,12 @@
         "width": 1878,
         "height": 875
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/bintang-manunggal-pratama/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "manwa": {
     "cover": {
@@ -344,7 +379,12 @@
         "width": 354,
         "height": 705
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/manwa/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "kelontong-id": {
     "cover": {
@@ -408,7 +448,12 @@
         "width": 1366,
         "height": 656
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/kelontong-id/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   },
   "web-11": {
     "cover": {
@@ -517,6 +562,29 @@
         "width": 1366,
         "height": 651
       }
-    ]
+    ],
+    "card": {
+      "src": "/projects/web-11/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
+  },
+  "ternusa": {
+    "cover": null,
+    "gallery": [],
+    "card": {
+      "src": "/projects/ternusa/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
+  },
+  "bintang-bot": {
+    "cover": null,
+    "gallery": [],
+    "card": {
+      "src": "/projects/bintang-bot/card.webp",
+      "width": 1600,
+      "height": 1200
+    }
   }
 }

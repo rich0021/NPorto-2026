@@ -8,13 +8,15 @@ import { PageTitle } from "../_components/page-title";
 
 export const metadata: Metadata = { title: "contact / naufal muttaqin" };
 
-// The contact frame: four grey squares centred on the screen, big grey word
-// bottom-left.
+// Where "let's have a talk, shall we?" lands: the huge word like every other
+// page, then the socials as grey squares.
 export default function ContactPage() {
   return (
     <PageShell>
       <PageMotion>
-        <div className="shell relative z-10 flex min-h-svh flex-col items-center justify-center gap-[clamp(32px,4vw,56px)] py-32">
+        <PageTitle>talk</PageTitle>
+
+        <div className="shell flex flex-col items-center gap-[clamp(32px,4vw,56px)] pt-[8.3vw] pb-[clamp(96px,12vw,200px)]">
           <p data-split="words" className="text-center text-[clamp(18px,1.6vw,24px)]">
             have something to build? say hi.
           </p>
@@ -27,7 +29,7 @@ export default function ContactPage() {
                     href={s.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="social-tile grid size-[clamp(88px,7vw,100px)] place-items-center bg-frame text-sm"
+                    className="social-tile grid size-[clamp(88px,7vw,100px)] place-items-center bg-placeholder text-sm"
                   >
                     <RollText>{s.label}</RollText>
                   </a>
@@ -46,8 +48,6 @@ export default function ContactPage() {
             it&apos;s <LocalTime timeZone={profile.timeZone} /> in bandung right now
           </p>
         </div>
-
-        <PageTitle>contact</PageTitle>
       </PageMotion>
     </PageShell>
   );

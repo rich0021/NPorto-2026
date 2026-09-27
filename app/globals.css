@@ -7,19 +7,23 @@
   --color-ghost: var(--ghost);
   --color-frame: var(--frame);
   --color-panel: var(--panel);
-  --font-sans: var(--font-zalando);
+  --color-ink: var(--ink);
+  --color-placeholder: var(--placeholder);
+  --font-sans: var(--font-jakarta);
 }
 
 :root {
   --bg: #ffffff;
-  --fg: #000000;
-  --ghost: rgb(0 0 0 / 0.2);
+  --fg: #222222;
+  --ghost: rgb(0 0 0 / 0.4);
+  --ink: #222222;
+  --placeholder: #d9d9d9;
   --frame: #c6c6c6;
   --panel: #f1f1f1;
   --gutter: clamp(16px, 3vw, 44px);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-wipe: cubic-bezier(0.76, 0, 0.24, 1);
-  --page-duration: 900ms;
+  --ease-page: cubic-bezier(0.72, 0, 0.18, 1);
+  --page-duration: 1100ms;
 }
 
 html,
@@ -30,7 +34,7 @@ body {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-zalando), system-ui, sans-serif;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
 }
 
 ::selection {
@@ -50,6 +54,22 @@ body {
   visibility: hidden;
 }
 
+.js .title-fx {
+  visibility: hidden;
+}
+
+/* Tech Text draws the page words; the DOM word stays only for layout. */
+.js .tech-title-text {
+  color: transparent;
+}
+
+/* Room above and below so rising and melting letters aren't cropped. */
+.tfx-mask {
+  overflow: clip;
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
 /* Split-text masks: extra room so tight display leading doesn't crop glyphs. */
 .split-line-mask {
   padding-block: 0.12em;
@@ -61,7 +81,16 @@ body {
     padding-inline: var(--gutter);
   }
 
-  /* The big grey page word: 130px in a 1440 frame. */
+  /* The huge page word from the frames: 400px bold in a 1440 frame. */
+  .display {
+    font-size: 27.78vw;
+    font-weight: 700;
+    line-height: 1.26;
+    white-space: nowrap;
+    color: var(--fg);
+  }
+
+  /* The smaller grey page word, still used for the case study's "up next". */
   .page-title {
     font-size: clamp(3.5rem, 9vw, 8.125rem);
     line-height: 0.8;
@@ -105,12 +134,12 @@ body {
   height: 88px;
   border-radius: 999px;
   background: #fff;
-  scale: 0.14;
+  scale: 0.3;
   transition: scale 450ms var(--ease-out);
 }
 
 .cursor[data-mode="link"] .cursor-disc {
-  scale: 0.5;
+  scale: 0.7;
 }
 
 /* With a label the disc turns solid, so the word stays legible over busy content. */
@@ -124,7 +153,7 @@ body {
 }
 
 .cursor.is-down .cursor-disc {
-  scale: 0.1;
+  scale: 0.22;
 }
 
 .cursor[data-mode="link"].is-down .cursor-disc,
@@ -142,6 +171,62 @@ body {
 .cursor[data-mode="label"] .cursor-label {
   opacity: 1;
   transition-delay: 120ms;
+}
+
+/* ---------- Menu button ----------
+   The burger folds into a close icon: the buns slide to the middle, flatten
+   and cross while the patty squeezes away, and as they cross they hand over
+   to two crisp bars growing from the centre. Reverses on close. */
+
+.burger path,
+.burger rect {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    translate 450ms var(--ease-out),
+    rotate 450ms var(--ease-out),
+    scale 450ms var(--ease-out),
+    opacity 250ms var(--ease-out);
+}
+
+.burger[aria-expanded="true"] .burger-top {
+  translate: 0 6px;
+  rotate: 45deg;
+  scale: 1 0.3;
+  opacity: 0;
+  transition-delay: 0ms, 120ms, 0ms, 220ms;
+}
+
+.burger[aria-expanded="true"] .burger-bottom {
+  translate: 0 -6px;
+  rotate: -45deg;
+  scale: 1 0.3;
+  opacity: 0;
+  transition-delay: 0ms, 120ms, 0ms, 220ms;
+}
+
+.burger-x {
+  opacity: 0;
+  scale: 0 1;
+}
+
+.burger-x1 {
+  rotate: 45deg;
+}
+
+.burger-x2 {
+  rotate: -45deg;
+}
+
+.burger[aria-expanded="true"] .burger-x {
+  opacity: 1;
+  scale: 1;
+  transition-delay: 200ms;
+}
+
+.burger[aria-expanded="true"] .burger-patty {
+  scale: 0 1;
+  opacity: 0;
 }
 
 /* ---------- Rolling link text ---------- */
@@ -179,7 +264,97 @@ a:focus-visible .roll-inner {
   border-color: var(--fg);
 }
 
+/* A short rule that keeps draining downward, under "scroll". */
+.scroll-cue {
+  position: relative;
+  width: 1px;
+  height: 28px;
+  overflow: hidden;
+  background: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.scroll-cue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--fg);
+  animation: scroll-cue 1.8s var(--ease-page) infinite;
+}
+
+@keyframes scroll-cue {
+  0% { translate: 0 -100%; }
+  60%, 100% { translate: 0 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue::after {
+    animation: none;
+    translate: 0 0;
+  }
+}
+
+/* ---------- Home: the three phases ---------- */
+
+.js .phase-line {
+  visibility: hidden;
+}
+
+.phase-char {
+  text-align: center;
+}
+
+.phase-char.is-code {
+  font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+  color: var(--ghost);
+}
+
+.phase-char.is-code.is-near {
+  color: var(--fg);
+}
+
+.phase-caret {
+  display: inline-block;
+  margin-left: 0.05em;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { visibility: hidden; }
+}
+
+/* ---------- About ---------- */
+
+/* Scroll Reveal's starting look, before its script takes over. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .bio-p .word {
+    opacity: 0.1;
+    filter: blur(4px);
+  }
+}
+
+.bio-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  transition: text-decoration-color 300ms var(--ease-out);
+}
+
+.bio-link:hover,
+.bio-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
 /* ---------- Work ---------- */
+
+.work-img {
+  transition: scale 900ms var(--ease-out);
+}
+
+.work-card:hover .work-img,
+.work-card:focus-visible .work-img {
+  scale: 1.05;
+}
 
 .project-card .frame-img {
   transition: scale 700ms var(--ease-out);
@@ -454,8 +629,30 @@ a:focus-visible .roll-inner {
    the screen: the background widens from inset to full bleed, the top
    corners square off, and the close button slides out to the screen corner. */
 
-html.sheet-open {
+/* Overlays stop Lenis, which already blocks wheel and touch scrolling. The
+   menu leaves the page its scrollbar so nothing reflows or jumps sideways
+   (Lenis's own stylesheet would clip it). Without Lenis (reduced motion) the
+   page is locked the plain way. */
+html.lenis.lenis-stopped:not(.lenis-autoToggle) {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+html.menu-open:not(.lenis) {
   overflow: hidden;
+}
+
+/* The sheet scrolls on its own, so the page hides its scrollbar and leaves
+   only the sheet's, at the screen edge. The page is padded by the scrollbar's
+   width (--sbw, measured on open) so its layout doesn't shift under the sheet,
+   and fixed things on the right (the menu button) stay put. */
+html.sheet-open,
+html.lenis.sheet-open.lenis-stopped:not(.lenis-autoToggle) {
+  overflow: hidden;
+}
+
+html.sheet-open body {
+  padding-right: var(--sbw, 0px);
 }
 
 .sheet {
@@ -463,9 +660,18 @@ html.sheet-open {
   --sheet-x: clamp(8px, 2.1vw, 30px);
   --sheet-top: clamp(88px, 22svh, 200px);
   --sheet-radius: clamp(24px, 3.5vw, 50px);
+  /* Content padding inside the sheet: 30px (60px on the story's side). */
+  --sheet-pad: clamp(16px, 2.1vw, 30px);
 }
 
+.sheet-pad {
+  padding: var(--sheet-pad) var(--sheet-pad) 0 calc(var(--sheet-pad) * 2);
+}
+
+/* flow-root: without it the close rail's top margin collapses into the
+   sheet's own, and the button sits on the sheet's edge instead of 45px in. */
 .sheet-inner {
+  display: flow-root;
   position: relative;
   margin: var(--sheet-top) var(--sheet-x) 0;
   min-height: calc(100svh - var(--sheet-top));
@@ -481,27 +687,34 @@ html.sheet-open {
   background: var(--bg);
 }
 
-/* Rests 45px inside the sheet's corner, then pins 15px from the screen's. */
+/* Rests 45px inside the sheet's corner (just inside the first image's), then
+   pins 15px from the screen's. A dark, blurred disc like Humaan's, so it reads
+   over screenshots and the page alike. */
 .sheet-close-rail {
   position: sticky;
   top: 15px;
   z-index: 10;
   height: 0;
   margin-top: 45px;
+  margin-bottom: -45px; /* takes no room: the content still starts at the top */
 }
 
+/* 45px in at full size (the sheet's 30px padding + 15px), tighter on phones. */
 .sheet-close {
+  --close-in: calc(var(--sheet-pad) + 15px);
   position: absolute;
   top: 0;
-  right: 45px;
+  right: var(--close-in);
   display: grid;
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
   border-radius: 999px;
-  background: var(--bg);
-  translate: calc(var(--p) * (var(--sheet-x) + 30px)) 0;
+  background: rgb(0 0 0 / 0.35);
+  color: #fff;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  translate: calc(var(--p) * (var(--sheet-x) + var(--close-in) - 15px)) 0;
   transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out), rotate 500ms var(--ease-out);
 }
 
@@ -513,12 +726,15 @@ html.sheet-open {
 }
 
 /* ---------- Page transitions ----------
-   The old page lifts away while the new one wipes up over it like a curtain
-   (down when going back). The header stays put, and the page word and the
-   project frames morph between pages as shared elements. */
+   The new page slides up over the old one (down when going back) while the
+   old one is pushed a third of the way along behind it, slower, like a
+   parallax layer. Nothing fades: only translate animates, so the compositor
+   runs it and it stays smooth while the new page is still mounting. The menu
+   button, menu and liquid stay put. */
 
 ::view-transition {
   pointer-events: none;
+  background: var(--ink);
 }
 
 ::view-transition-old(root),
@@ -526,16 +742,32 @@ html.sheet-open {
   animation: none;
 }
 
-::view-transition-group(site-header) {
+::view-transition-group(site-header),
+::view-transition-group(site-menu),
+::view-transition-group(liquid) {
   animation: none;
   z-index: 100;
 }
 
-::view-transition-old(site-header) {
+::view-transition-group(site-header) {
+  z-index: 101;
+}
+
+/* Snapshots don't carry the element's blend mode, so multiply the group. */
+::view-transition-group(liquid) {
+  z-index: 102;
+  mix-blend-mode: multiply;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(site-menu),
+::view-transition-old(liquid) {
   display: none;
 }
 
-::view-transition-new(site-header) {
+::view-transition-new(site-header),
+::view-transition-new(site-menu),
+::view-transition-new(liquid) {
   animation: none;
 }
 
@@ -550,58 +782,46 @@ html.sheet-open {
 }
 
 ::view-transition-old(.page-out-forward) {
-  animation: var(--page-duration) var(--ease-wipe) both page-lift-up;
+  animation: var(--page-duration) var(--ease-page) both page-sink-up;
 }
 
 ::view-transition-new(.page-in-forward) {
-  animation: var(--page-duration) var(--ease-wipe) both page-wipe-up;
+  animation: var(--page-duration) var(--ease-page) both page-rise;
 }
 
 ::view-transition-old(.page-out-back) {
-  animation: var(--page-duration) var(--ease-wipe) both page-lift-down;
+  animation: var(--page-duration) var(--ease-page) both page-sink-down;
 }
 
 ::view-transition-new(.page-in-back) {
-  animation: var(--page-duration) var(--ease-wipe) both page-wipe-down;
+  animation: var(--page-duration) var(--ease-page) both page-drop;
+  /* Only its first screen comes down; the rest of a long page would
+     otherwise hang below it and cover the old page at once. */
+  clip-path: inset(0 0 max(0px, calc(100% - 100vh)) 0);
 }
 
-@keyframes page-lift-up {
-  to { translate: 0 -14%; scale: 0.96; opacity: 0.4; }
+/* In screen heights, not %: a page's snapshot is as tall as the whole page,
+   so 100% would start a long page thousands of pixels away. */
+@keyframes page-sink-up {
+  to { translate: 0 -33vh; }
 }
 
-@keyframes page-lift-down {
-  to { translate: 0 14%; scale: 0.96; opacity: 0.4; }
+@keyframes page-sink-down {
+  to { translate: 0 33vh; }
 }
 
-@keyframes page-wipe-up {
-  from { clip-path: inset(100% 0 0 0); translate: 0 18%; }
-  to { clip-path: inset(0); translate: 0 0; }
+@keyframes page-rise {
+  from { translate: 0 100vh; }
 }
 
-@keyframes page-wipe-down {
-  from { clip-path: inset(0 0 100% 0); translate: 0 -18%; }
-  to { clip-path: inset(0); translate: 0 0; }
+@keyframes page-drop {
+  from { translate: 0 -100vh; }
 }
 
-::view-transition-group(.title-morph),
 ::view-transition-group(.frame-morph) {
   z-index: 3;
   animation-duration: var(--page-duration);
-  animation-timing-function: var(--ease-wipe);
-}
-
-::view-transition-old(.title-morph),
-::view-transition-new(.title-morph) {
-  animation-duration: var(--page-duration);
-  animation-timing-function: var(--ease-wipe);
-}
-
-::view-transition-image-pair(.title-morph) {
-  animation: morph-blur var(--page-duration) var(--ease-wipe);
-}
-
-@keyframes morph-blur {
-  40% { filter: blur(6px); }
+  animation-timing-function: var(--ease-page);
 }
 
 @media (prefers-reduced-motion: reduce) {

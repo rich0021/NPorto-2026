@@ -12,7 +12,13 @@ import { pageScroll } from "./smooth-scroll";
 // Lenis; over the first stretch of scrolling the sheet's background widens to
 // full bleed and its corners square off, and the round close button pins to
 // the top-right corner. Closing (×, Escape, or a click on the dimmed area)
-// slides it back down and goes back.
+// slides the whole overlay down off the screen and goes back.
+//
+// The rise and fall use the Web Animations API on transform and opacity, so
+// the compositor runs them: they stay smooth while the case study mounts,
+// which is exactly when the sheet is moving.
+const RISE = { duration: 1100, easing: "cubic-bezier(0.16, 1, 0.3, 1)" };
+const FALL = { duration: 650, easing: "cubic-bezier(0.7, 0, 0.84, 0)" };
 export function ProjectSheet({ children, slug, title }: { children: React.ReactNode; slug: string; title: string }) {
   const router = useRouter();
   const root = useRef<HTMLDivElement>(null);
@@ -28,24 +34,40 @@ export function ProjectSheet({ children, slug, title }: { children: React.ReactN
     if (closing.current) return;
     closing.current = true;
     pageScroll.keepPosition = true;
-    const reduce = prefersReducedMotion();
-    gsap.to(sheet.current, { y: () => window.innerHeight, duration: reduce ? 0 : 0.7, ease: "power3.in" });
-    gsap.to(backdrop.current, { opacity: 0, duration: reduce ? 0 : 0.7, onComplete: () => router.back() });
+    const duration = prefersReducedMotion() ? 0 : FALL.duration;
+    const down = `translate3d(0, ${window.innerHeight}px, 0)`;
+    // No more scrolling or clicks on the way out. (Not lenis.stop(): that
+    // clips the scroller's overflow, which snaps it back to the top.)
+    if (root.current) root.current.style.pointerEvents = "none";
+    // The scroller, not the sheet: it is exactly one screen tall, so one
+    // screen down always clears it, however far the sheet was scrolled (a
+    // long sheet moved a screen down would still cover it, then vanish). Both
+    // start from where they are now, in case the rise is still running.
+    scroller.current?.animate({ transform: ["none", down] }, { ...FALL, duration, fill: "forwards" });
+    const from = backdrop.current ? getComputedStyle(backdrop.current).opacity : "0.5";
+    const fade = backdrop.current?.animate({ opacity: [from, "0"] }, { ...FALL, duration, fill: "forwards" });
+    if (fade) fade.onfinish = () => router.back();
+    else router.back();
   };
 
   useGSAP(
     () => {
       const html = document.documentElement;
+      // The page's scrollbar goes while the sheet is open (see .sheet-open).
+      html.style.setProperty("--sbw", `${window.innerWidth - html.clientWidth}px`);
       html.classList.add("sheet-open");
       pageScroll.current?.stop();
 
       const reduce = prefersReducedMotion();
-      gsap.fromTo(backdrop.current, { opacity: 0 }, { opacity: 0.5, duration: reduce ? 0 : 0.8, ease: "power2.out" });
-      gsap.fromTo(
-        sheet.current,
-        { y: () => window.innerHeight },
-        { y: 0, duration: reduce ? 0 : 1.1, ease: "power3.out" },
-      );
+      if (!reduce) {
+        const up = `translate3d(0, ${window.innerHeight}px, 0)`;
+        const rise = sheet.current?.animate({ transform: [up, "none"] }, RISE);
+        // The case study measures its scroll triggers as it mounts, while the
+        // sheet is still a screen lower on its way up; measure again once it
+        // has landed, or every reveal inside fires a screen late.
+        if (rise) rise.onfinish = () => ScrollTrigger.refresh();
+        backdrop.current?.animate({ opacity: [0, 0.5] }, { duration: 800, easing: "ease-out" });
+      }
       closeButton.current?.focus({ preventScroll: true });
 
       // 0 while the sheet rests below the top, 1 once it has scrolled up to it.
@@ -73,6 +95,7 @@ export function ProjectSheet({ children, slug, title }: { children: React.ReactN
         lenis.current?.destroy();
         lenis.current = null;
         html.classList.remove("sheet-open");
+        html.style.removeProperty("--sbw");
         pageScroll.current?.start();
       };
     },
@@ -99,7 +122,7 @@ export function ProjectSheet({ children, slug, title }: { children: React.ReactN
 
   return (
     <div ref={root} role="dialog" aria-modal="true" aria-label={title} className="sheet fixed inset-0 z-[60]">
-      <div ref={backdrop} className="absolute inset-0 bg-black opacity-0" />
+      <div ref={backdrop} className="absolute inset-0 bg-black opacity-50" />
 
       <div
         ref={scroller}
@@ -120,8 +143,8 @@ export function ProjectSheet({ children, slug, title }: { children: React.ReactN
                 aria-label="Close project"
                 className="sheet-close"
               >
-                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-                  <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
+                  <path d="M2.33 15.67 15.67 2.33m0 13.34L2.33 2.33" stroke="currentColor" strokeWidth="2" strokeLinecap="square" fill="none" />
                 </svg>
               </button>
             </div>
