@@ -3,18 +3,26 @@
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { gsap, hasFinePointer, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import FlexCarousel, { type FlexCarouselControl, type FlexCarouselItem } from "./flex-carousel";
+import FlexCarousel, { type FlexCarouselControl, type FlexCarouselDrag, type FlexCarouselItem } from "./flex-carousel";
+import { pageScroll } from "./smooth-scroll";
 
 export type WorkItem = FlexCarouselItem & { slug: string; preview?: string };
 
 // How far you scroll per card, × the screen height.
 const SCROLL_PER_CARD = 0.45;
 
+// How far a released drag carries on, in seconds of its speed, and how fast
+// (cards a second) a flick has to be to move on a card by itself.
+const FLICK_CARRY = 0.32;
+const FLICK_SPEED = 1;
+
 // The work gallery: React Bits' Flex Carousel, one card per project, linked
 // to the page scroll. The carousel pins in the middle of the screen and
 // scrolling down runs it from the first project to the last, then the page
-// carries on. It isn't draggable; sideways scroll and the arrow keys still
-// move it, and clicking the card in the middle (or Enter) opens that project.
+// carries on. Dragging it sideways (mouse or finger) scrolls the page through
+// the same stretch, so the cards always sit where the scroll says; letting go
+// settles on the nearest card. Sideways scroll and the arrow keys still move
+// it, and clicking the card in the middle (or Enter) opens that project.
 // Hovering a card floats that project's screenshot at the cursor.
 export function WorkCarousel({ items }: { items: WorkItem[] }) {
   const router = useRouter();
@@ -22,12 +30,14 @@ export function WorkCarousel({ items }: { items: WorkItem[] }) {
   const preview = useRef<HTMLDivElement>(null);
   const control = useRef<FlexCarouselControl | null>(null);
   const hover = useRef<(index: number | null) => void>(() => {});
+  const trigger = useRef<ScrollTrigger | null>(null);
+  const dragFrom = useRef(0);
 
   useGSAP(
     () => {
       const el = ref.current;
       if (!el || items.length < 2) return;
-      ScrollTrigger.create({
+      trigger.current = ScrollTrigger.create({
         trigger: el,
         start: "center center",
         end: () => `+=${window.innerHeight * SCROLL_PER_CARD * (items.length - 1)}`,
@@ -35,9 +45,37 @@ export function WorkCarousel({ items }: { items: WorkItem[] }) {
         invalidateOnRefresh: true,
         onUpdate: (self) => control.current?.setProgress(self.progress),
       });
+      return () => void (trigger.current = null);
     },
     { scope: ref, dependencies: [items.length] },
   );
+
+  // A drag moves the page scroll, not the cards: while it's held the page
+  // jumps with the pointer (the cards' own spring smooths it), and on release
+  // it glides to the nearest card, carrying a flick along.
+  const drag: FlexCarouselDrag = (phase, offset, velocity) => {
+    const st = trigger.current;
+    if (!st) return;
+    if (phase === "start") {
+      dragFrom.current = st.progress;
+      return;
+    }
+    const clamp = gsap.utils.clamp(0, 1);
+    let progress = clamp(dragFrom.current + offset);
+    if (phase === "end") {
+      const last = items.length - 1;
+      const from = Math.round(dragFrom.current * last);
+      let to = Math.round(clamp(progress + velocity * FLICK_CARRY) * last);
+      if (to === from && Math.abs(velocity * last) > FLICK_SPEED) to = from + Math.sign(velocity);
+      progress = gsap.utils.clamp(0, last, to) / last;
+    }
+    const y = st.start + progress * (st.end - st.start);
+    const lenis = pageScroll.current;
+    // No Lenis means reduced motion, so no glide either.
+    if (!lenis) window.scrollTo(0, y);
+    else if (phase === "move") lenis.scrollTo(y, { immediate: true });
+    else lenis.scrollTo(y, { duration: 0.9, easing: (t) => 1 - Math.pow(2, -10 * t) });
+  };
 
   // The floating screenshot. The carousel is a canvas, so it reports which
   // card is under the pointer (re-checked every frame, including while the
@@ -122,7 +160,7 @@ export function WorkCarousel({ items }: { items: WorkItem[] }) {
           <FlexCarousel
             items={items}
             controlRef={control}
-            draggable={false}
+            onDrag={drag}
             cardHeight={0.62 / 1.5}
             focusOnClick={false}
             captureWheel={false}

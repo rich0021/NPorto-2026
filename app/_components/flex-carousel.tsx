@@ -6,6 +6,9 @@
 //     progress from the first card to the last (the work page links it to
 //     scrolling)
 //   - `draggable`: false turns off dragging (clicks, keys and wheel remain)
+//   - `onDrag`: hands dragging to the page. A drag is reported as progress
+//     along the strip instead of moving the cards, so the page can scroll to
+//     match and drive the cards back through `controlRef`
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { CSSProperties, Ref } from 'react';
 import { Renderer, Program, Mesh, Triangle, Plane, Texture, RenderTarget } from 'ogl';
@@ -40,6 +43,11 @@ export interface FlexCarouselControl {
   setProgress: (progress: number) => void;
 }
 
+// local: `offset` is how far the drag has gone since it started, and
+// `velocity` how fast it was moving on release (per second), both in the 0-1
+// progress units of `setProgress`
+export type FlexCarouselDrag = (phase: 'start' | 'move' | 'end', offset: number, velocity: number) => void;
+
 export interface FlexCarouselProps extends Partial<PresetValues> {
   controlRef?: Ref<FlexCarouselControl>; // local
   draggable?: boolean; // local
@@ -59,6 +67,7 @@ export interface FlexCarouselProps extends Partial<PresetValues> {
   onChange?: (index: number, item: FlexCarouselItem) => void;
   onSelect?: (index: number, item: FlexCarouselItem) => void;
   onHover?: (index: number | null) => void; // local
+  onDrag?: FlexCarouselDrag; // local
   className?: string;
   style?: CSSProperties;
 }
@@ -139,6 +148,7 @@ interface Callbacks {
   onChange?: (index: number, item: FlexCarouselItem) => void;
   onSelect?: (index: number, item: FlexCarouselItem) => void;
   onHover?: (index: number | null) => void; // local
+  onDrag?: FlexCarouselDrag; // local
 }
 
 const photo = (id: string) => `https://images.unsplash.com/${id}?w=1200&q=80&auto=format&fit=max`;
@@ -429,6 +439,7 @@ const FlexCarousel = ({
   onChange,
   onSelect,
   onHover,
+  onDrag,
   className = '',
   style,
   controlRef,
@@ -438,7 +449,7 @@ const FlexCarousel = ({
   const settingsRef = useRef<Settings | null>(null);
   const itemsRef = useRef<FlexCarouselItem[]>(items);
   const engineRef = useRef<Engine | null>(null);
-  const callbacksRef = useRef<Callbacks>({ onChange, onSelect, onHover });
+  const callbacksRef = useRef<Callbacks>({ onChange, onSelect, onHover, onDrag });
   const [active, setActive] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
@@ -452,7 +463,7 @@ const FlexCarousel = ({
 
   useEffect(() => {
     itemsRef.current = list;
-    callbacksRef.current = { onChange, onSelect, onHover };
+    callbacksRef.current = { onChange, onSelect, onHover, onDrag };
     settingsRef.current = {
       draggable,
       intro,
@@ -904,7 +915,8 @@ const FlexCarousel = ({
         goal = snapPoint(m, goal);
         mode = 'spring';
       }
-      if (!pointer.dragging) {
+      // local: with onDrag the cards keep springing after the page mid-drag
+      if (!pointer.dragging || callbacksRef.current.onDrag) {
         const spinning = introState.running && introState.kind === 'spin';
         const stiffness = spinning ? 9 : mode === 'wheel' ? 80 : 55;
         const damping = 2 * Math.sqrt(stiffness);
@@ -1149,6 +1161,10 @@ const FlexCarousel = ({
       raf = requestAnimationFrame(frame);
     };
 
+    // local: the distance from the first card's center to the last's, which
+    // is what onDrag's progress units are measured against
+    const span = (m: Metrics) => m.centers[m.centers.length - 1] - m.centers[0];
+
     const localPoint = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect();
       return [e.clientX - rect.left, e.clientY - rect.top];
@@ -1204,15 +1220,23 @@ const FlexCarousel = ({
               pointer.dragging = true;
             }
             container.setAttribute('data-dragging', '');
+            callbacksRef.current.onDrag?.('start', 0, 0); // local
           }
         }
         if (pointer.dragging) {
-          pos = pointer.startPos - (x - pointer.startX);
-          goal = pos;
-          vel = 0;
           const now = performance.now();
           pointer.samples.push({ x, t: now });
           while (pointer.samples.length > 2 && now - pointer.samples[0].t > 100) pointer.samples.shift();
+          const s = settingsRef.current;
+          const report = callbacksRef.current.onDrag; // local
+          if (report && s) {
+            const length = span(metrics(s));
+            if (length > 0) report('move', -(x - pointer.startX) / length, 0);
+          } else {
+            pos = pointer.startPos - (x - pointer.startX);
+            goal = pos;
+            vel = 0;
+          }
         }
       }
       dirty = true;
@@ -1235,6 +1259,14 @@ const FlexCarousel = ({
         let velocity = 0;
         if (first && lastSample && lastSample.t > first.t && now - lastSample.t < 70) {
           velocity = -((lastSample.x - first.x) / (lastSample.t - first.t)) * 1000;
+        }
+        // local: the page settles the drag (and the cards follow its scroll)
+        const report = callbacksRef.current.onDrag;
+        if (report) {
+          const length = span(m);
+          if (length > 0) report('end', -(pointer.x - pointer.startX) / length, velocity / length);
+          start();
+          return;
         }
         vel = velocity;
         const landing = snapPoint(m, pos + velocity * 0.32);
@@ -1283,11 +1315,20 @@ const FlexCarousel = ({
     };
 
     const onPointerCancel = () => {
+      const wasDragging = pointer.dragging;
       pointer.down = false;
       pointer.dragging = false;
       container.removeAttribute('data-dragging');
       const s = settingsRef.current;
       if (!s) return;
+      // local: let the page settle where the drag was left
+      const report = callbacksRef.current.onDrag;
+      if (report) {
+        const length = span(metrics(s));
+        if (wasDragging && length > 0) report('end', -(pointer.x - pointer.startX) / length, 0);
+        start();
+        return;
+      }
       goal = snapPoint(metrics(s), pos);
       mode = 'spring';
       start();
