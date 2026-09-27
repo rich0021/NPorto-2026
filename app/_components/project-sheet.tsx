@@ -82,7 +82,7 @@ export function ProjectSheet({ children, slug, title }: { children: React.ReactN
 
       let raf: ((time: number) => void) | undefined;
       if (!reduce && content.current) {
-        const instance = new Lenis({ wrapper: el, content: content.current, autoRaf: false, lerp: 0.09 });
+        const instance = new Lenis({ wrapper: el, content: content.current, autoRaf: false, lerp: 0.06, wheelMultiplier: 0.8 });
         instance.on("scroll", ScrollTrigger.update);
         raf = (time) => instance.raf(time * 1000);
         gsap.ticker.add(raf);

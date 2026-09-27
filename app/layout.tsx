@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Cursor } from "./_components/cursor";
 import { Header } from "./_components/header";
 import { LiquidCanvas } from "./_components/liquid-canvas";
+import { Loader } from "./_components/loader";
 import { SmoothScroll } from "./_components/smooth-scroll";
 import "lenis/dist/lenis.css";
 import "./globals.css";
@@ -30,6 +31,7 @@ export default function RootLayout({ children, sheet }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full">
         <SmoothScroll />
+        <Loader />
         <Header />
         {children}
         {sheet}

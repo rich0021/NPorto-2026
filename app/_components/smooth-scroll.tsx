@@ -23,7 +23,7 @@ export function SmoothScroll() {
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    const instance = new Lenis({ autoRaf: false, lerp: 0.09, wheelMultiplier: 1 });
+    const instance = new Lenis({ autoRaf: false, lerp: 0.06, wheelMultiplier: 0.8 });
     lenis.current = instance;
     pageScroll.current = instance;
     instance.on("scroll", ScrollTrigger.update);

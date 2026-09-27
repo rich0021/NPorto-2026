@@ -10,6 +10,7 @@
 //   - the pointer is tracked on the window and the canvas ignores clicks, so
 //     its padding never blocks what's underneath; dragging is mouse/pen only
 import { useEffect, useRef } from 'react';
+import { pageReady } from '@/lib/page-ready';
 import type { CSSProperties } from 'react';
 
 type Box = { x1: number; y1: number; x2: number; y2: number };
@@ -182,10 +183,12 @@ const TechText = ({
     const grab = { x: 0, y: 0 };
     const lens = { x: 0, y: 0 };
     const frame = { x1: 0, y1: 0, x2: 0, y2: 0, alpha: 0, index: -1 };
-    // local: when the entrance starts (after fonts load), and whether it's done
+    // local: when the entrance starts (after fonts load and the first-load
+    // loader lifts), and whether it's done
     let enterAt = -1;
     let entered = false;
     let fontsReady = !document.fonts;
+    let revealed = false;
 
     const refreshFonts = () => {
       layoutKey = '';
@@ -548,7 +551,7 @@ const TechText = ({
       // local: the entrance. Until every letter has landed, nothing reacts.
       let rise: number[] | null = null;
       if (s.enter && !entered && !reducedMotion) {
-        if (enterAt < 0 && fontsReady) enterAt = now + s.enter.delay * 1000;
+        if (enterAt < 0 && fontsReady && revealed) enterAt = now + s.enter.delay * 1000;
         const t = enterAt < 0 ? -1 : (now - enterAt) / 1000;
         const drop = view.size * 1.26 * 1.15;
         rise = glyphs.map((_, i) => (1 - expoOut(Math.max(0, (t - i * ENTER_STAGGER) / ENTER_DURATION))) * drop);
@@ -758,6 +761,10 @@ const TechText = ({
       refreshFonts();
     };
     if (document.fonts) document.fonts.ready.then(onFonts, onFonts);
+    pageReady.then(() => {
+      revealed = true;
+      wake();
+    });
 
     resize();
 

@@ -63,6 +63,32 @@ body {
   color: transparent;
 }
 
+/* ---------- First-load loader ----------
+   Without scripts nothing would lift it, so it only exists with them. */
+
+html:not(.js) .loader {
+  display: none;
+}
+
+.loader {
+  transition: transform var(--page-duration) var(--ease-page);
+}
+
+.loader.is-leaving {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    transition: opacity 300ms;
+  }
+
+  .loader.is-leaving {
+    transform: none;
+    opacity: 0;
+  }
+}
+
 /* Room above and below so rising and melting letters aren't cropped. */
 .tfx-mask {
   overflow: clip;
