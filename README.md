@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# nporto-2026
 
-## Getting Started
+Personal portfolio of Muhammad Naufal Muttaqin, a full-stack developer based in Bandung, Indonesia.
 
-First, run the development server:
+Built with Next.js 16 (App Router), React 19, Tailwind CSS 4, GSAP, Lenis and OGL.
+
+## Getting started
+
+Requires Node.js 20+.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Script          | What it does                     |
+| --------------- | -------------------------------- |
+| `npm run dev`   | Start the dev server             |
+| `npm run build` | Build for production             |
+| `npm run start` | Serve the production build       |
+| `npm run lint`  | Run ESLint                       |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project structure
 
-## Learn More
+```
+app/
+  layout.tsx            Root layout: smooth scroll, header, WebGL canvas, cursor
+  page.tsx              Home
+  about/                About page
+  contact/              Contact page
+  work/                 Work index and full-page case studies (/work/[slug])
+  @sheet/               Parallel route that opens case studies in a bottom sheet
+  _components/          Shared UI and motion components
+lib/
+  content.ts            All site copy, projects, bio, story and social links
+  project-media.json    Image paths and dimensions for each project
+  gsap.ts               GSAP plugin registration
+  webgl.ts              Render-target helpers for the liquid background
+public/projects/<slug>/ Project images (cover, card, gallery)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Editing content
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+All copy lives in [lib/content.ts](lib/content.ts), so content changes never touch layout code. Search for `TODO` there before shipping.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To add a project:
 
-## Deploy on Vercel
+1. Put its images in `public/projects/<slug>/`: `cover.webp`, `card.webp` (the work carousel title card) and numbered gallery shots (`01.webp`, `02.webp`, …).
+2. Add an entry for `<slug>` in [lib/project-media.json](lib/project-media.json) with each image's `src`, `width` and `height`.
+3. Add a `Project` to the `projects` array in `lib/content.ts`, spreading `...withMedia("<slug>")` for the images.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The case study is then available at `/work/<slug>`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## How the case study routes work
+
+Clicking a project from inside the site opens its case study in a bottom sheet over the current page, via the intercepting route `app/@sheet/(.)work/[slug]`. Visiting `/work/<slug>` directly, or reloading, renders the full page from `app/work/[slug]` instead.
+
+## Notes
+
+- This project uses Next.js 16, whose APIs and conventions differ from earlier versions. Check `node_modules/next/dist/docs/` before changing routing or data fetching. See [AGENTS.md](AGENTS.md).
+- The liquid background falls back to no effect on GPUs that can't render into half-float targets.
+- Bump `iteration` in `lib/content.ts` when the design changes; it's shown at the foot of the sidebar.
