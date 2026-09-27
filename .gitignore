@@ -41,3 +41,18 @@ yarn-error.log*
 next-env.d.ts
 
 /brag-output
+
+# AI / agent / skill files
+.agents/
+.claude/
+.cursor/
+.windsurf/
+.gemini/
+.codex/
+.github/copilot-instructions.md
+.mcp.json
+AGENTS.md
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+skills-lock.json
