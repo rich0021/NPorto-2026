@@ -29,7 +29,11 @@ export function TitleFx({
       gsap.set(root, { visibility: "visible" });
       if (prefersReducedMotion()) return;
 
-      gsap.set(chars, { transformOrigin: "50% 100%" });
+      // The start position is set on its own, not as the rise's `from`:
+      // ScrollTrigger rewinds the rise whenever it re-measures (fonts, resize,
+      // the loader lifting), and letters whose stagger hadn't begun lost their
+      // `from` and sat in place, then dropped out of sight one by one.
+      gsap.set(chars, { yPercent: 115, transformOrigin: "50% 100%" });
       // The mask only exists for the rise; after it, drifting letters may leave it.
       const mask = root.querySelector<HTMLElement>(".tfx-mask")!;
       // Clamped: a line at the very foot of a tall, narrow screen can't scroll
@@ -43,7 +47,7 @@ export function TitleFx({
             mask.style.overflow = "visible";
           },
         })
-        .from(chars, { yPercent: 115, duration: 1.2, ease: "expo.out", stagger: 0.05 });
+        .to(chars, { yPercent: 0, duration: 1.2, ease: "expo.out", stagger: 0.05 });
 
       if (drift) {
         const seed = chars.map((_, i) => ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1);

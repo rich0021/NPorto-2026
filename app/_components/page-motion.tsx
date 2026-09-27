@@ -43,8 +43,11 @@ export function PageMotion({ children, className }: { children: React.ReactNode;
           charsClass: "split-char",
           onSplit(self) {
             gsap.set(el, { visibility: "visible" });
-            return gsap.from(self[unit], {
-              yPercent: 110,
+            // Start position set on its own, so a re-measure that rewinds the
+            // rise can't leave not-yet-started pieces showing (see TitleFx).
+            gsap.set(self[unit], { yPercent: 110 });
+            return gsap.to(self[unit], {
+              yPercent: 0,
               duration: unit === "chars" ? 1.2 : 1.1,
               ease: "expo.out",
               stagger: unit === "chars" ? 0.045 : unit === "words" ? 0.03 : 0.09,
