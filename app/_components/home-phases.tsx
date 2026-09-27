@@ -257,7 +257,7 @@ export function HomePhases({ phases, stack, cases }: Props) {
                     </li>
                   ))}
                 </ul>
-                <p className="phase-caption text-[13px] text-ghost">three of them, so far</p>
+                <p className="phase-caption text-[13px] text-ghost">and many more</p>
               </>
             )}
 
