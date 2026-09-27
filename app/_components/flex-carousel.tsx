@@ -6,9 +6,10 @@
 //     progress from the first card to the last (the work page links it to
 //     scrolling)
 //   - `draggable`: false turns off dragging (clicks, keys and wheel remain)
-//   - `onDrag`: hands dragging to the page. A drag is reported as progress
-//     along the strip instead of moving the cards, so the page can scroll to
-//     match and drive the cards back through `controlRef`
+//   - `onDrag`: hands the drag's outcome to the page. The cards still follow
+//     the pointer (held back past the first and last card), and the drag is
+//     reported as progress along the strip, so the page can scroll to match
+//     and pick the card to settle on through `controlRef`
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { CSSProperties, Ref } from 'react';
 import { Renderer, Program, Mesh, Triangle, Plane, Texture, RenderTarget } from 'ogl';
@@ -617,7 +618,9 @@ const FlexCarousel = ({
       startPos: 0,
       dragging: false,
       touch: false,
-      samples: [] as { x: number; t: number }[]
+      samples: [] as { x: number; t: number }[],
+      lo: -Infinity, // local: the first and last card, with onDrag
+      hi: Infinity
     };
     const introState = { kind: 'none', t: 0, running: false, done: false, readyAt: 0 };
     const focus = { index: -1, pending: -1, t: 0, v: 0, target: 0 };
@@ -915,8 +918,7 @@ const FlexCarousel = ({
         goal = snapPoint(m, goal);
         mode = 'spring';
       }
-      // local: with onDrag the cards keep springing after the page mid-drag
-      if (!pointer.dragging || callbacksRef.current.onDrag) {
+      if (!pointer.dragging) {
         const spinning = introState.running && introState.kind === 'spin';
         const stiffness = spinning ? 9 : mode === 'wheel' ? 80 : 55;
         const damping = 2 * Math.sqrt(stiffness);
@@ -1220,22 +1222,37 @@ const FlexCarousel = ({
               pointer.dragging = true;
             }
             container.setAttribute('data-dragging', '');
-            callbacksRef.current.onDrag?.('start', 0, 0); // local
+            // local: the ends of the strip, in the loop the drag starts in
+            const s = settingsRef.current;
+            if (callbacksRef.current.onDrag && s) {
+              const m = metrics(s);
+              const first = m.centers[0];
+              const last = m.centers[m.centers.length - 1];
+              const shift = Math.round((pos - (first + last) / 2) / m.loop) * m.loop;
+              pointer.lo = first + shift;
+              pointer.hi = last + shift;
+              callbacksRef.current.onDrag('start', 0, 0);
+            } else {
+              pointer.lo = -Infinity;
+              pointer.hi = Infinity;
+            }
           }
         }
         if (pointer.dragging) {
           const now = performance.now();
           pointer.samples.push({ x, t: now });
           while (pointer.samples.length > 2 && now - pointer.samples[0].t > 100) pointer.samples.shift();
+          pos = pointer.startPos - (x - pointer.startX);
+          // local: past either end the cards give only a third of the way
+          if (pos < pointer.lo) pos = pointer.lo + (pos - pointer.lo) / 3;
+          else if (pos > pointer.hi) pos = pointer.hi + (pos - pointer.hi) / 3;
+          goal = pos;
+          vel = 0;
           const s = settingsRef.current;
           const report = callbacksRef.current.onDrag; // local
           if (report && s) {
             const length = span(metrics(s));
             if (length > 0) report('move', -(x - pointer.startX) / length, 0);
-          } else {
-            pos = pointer.startPos - (x - pointer.startX);
-            goal = pos;
-            vel = 0;
           }
         }
       }
@@ -1260,15 +1277,18 @@ const FlexCarousel = ({
         if (first && lastSample && lastSample.t > first.t && now - lastSample.t < 70) {
           velocity = -((lastSample.x - first.x) / (lastSample.t - first.t)) * 1000;
         }
-        // local: the page settles the drag (and the cards follow its scroll)
+        vel = velocity;
+        // local: the page picks the card to settle on (its scroll moves the
+        // goal there) and the spring carries the cards over from the release
         const report = callbacksRef.current.onDrag;
         if (report) {
+          goal = pos;
+          mode = 'spring';
           const length = span(m);
           if (length > 0) report('end', -(pointer.x - pointer.startX) / length, velocity / length);
           start();
           return;
         }
-        vel = velocity;
         const landing = snapPoint(m, pos + velocity * 0.32);
         goal = landing;
         if (Math.abs(velocity) > 400 && Math.abs(landing - pos) < 1) step(m, velocity > 0 ? 1 : -1);

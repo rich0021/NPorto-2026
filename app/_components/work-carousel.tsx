@@ -11,9 +11,9 @@ export type WorkItem = FlexCarouselItem & { slug: string; preview?: string };
 // How far you scroll per card, × the screen height.
 const SCROLL_PER_CARD = 0.45;
 
-// How far a released drag carries on, in seconds of its speed, and how fast
-// (cards a second) a flick has to be to move on a card by itself.
-const FLICK_CARRY = 0.32;
+// A released drag moves on a card once it has gone this share of one, or
+// was flicked faster than this many cards a second.
+const SNAP_DISTANCE = 0.15;
 const FLICK_SPEED = 1;
 
 // The work gallery: React Bits' Flex Carousel, one card per project, linked
@@ -21,7 +21,8 @@ const FLICK_SPEED = 1;
 // scrolling down runs it from the first project to the last, then the page
 // carries on. Dragging it sideways (mouse or finger) scrolls the page through
 // the same stretch, so the cards always sit where the scroll says; letting go
-// settles on the nearest card. Sideways scroll and the arrow keys still move
+// snaps to a card, like a phone carousel: a short drag or a flick is enough to
+// move on one. Sideways scroll and the arrow keys still move
 // it, and clicking the card in the middle (or Enter) opens that project.
 // Hovering a card floats that project's screenshot at the cursor.
 export function WorkCarousel({ items }: { items: WorkItem[] }) {
@@ -50,9 +51,10 @@ export function WorkCarousel({ items }: { items: WorkItem[] }) {
     { scope: ref, dependencies: [items.length] },
   );
 
-  // A drag moves the page scroll, not the cards: while it's held the page
-  // jumps with the pointer (the cards' own spring smooths it), and on release
-  // it glides to the nearest card, carrying a flick along.
+  // A drag keeps the page scroll with the cards: while it's held the scroll
+  // follows the pointer, and on release it jumps to the card to settle on,
+  // which the carousel's spring then glides the cards to. The carousel is
+  // pinned, so the jump itself doesn't show.
   const drag: FlexCarouselDrag = (phase, offset, velocity) => {
     const st = trigger.current;
     if (!st) return;
@@ -60,21 +62,26 @@ export function WorkCarousel({ items }: { items: WorkItem[] }) {
       dragFrom.current = st.progress;
       return;
     }
-    const clamp = gsap.utils.clamp(0, 1);
-    let progress = clamp(dragFrom.current + offset);
+    let progress = gsap.utils.clamp(0, 1, dragFrom.current + offset);
     if (phase === "end") {
+      // In cards: where the drag started, where it was let go, and how fast.
       const last = items.length - 1;
       const from = Math.round(dragFrom.current * last);
-      let to = Math.round(clamp(progress + velocity * FLICK_CARRY) * last);
-      if (to === from && Math.abs(velocity * last) > FLICK_SPEED) to = from + Math.sign(velocity);
+      const at = progress * last;
+      const speed = velocity * last;
+      let to = Math.round(at);
+      if (to === from) {
+        if (Math.abs(speed) > FLICK_SPEED) to = from + Math.sign(speed);
+        else if (Math.abs(at - from) > SNAP_DISTANCE) to = from + Math.sign(at - from);
+      }
       progress = gsap.utils.clamp(0, last, to) / last;
     }
     const y = st.start + progress * (st.end - st.start);
-    const lenis = pageScroll.current;
-    // No Lenis means reduced motion, so no glide either.
-    if (!lenis) window.scrollTo(0, y);
-    else if (phase === "move") lenis.scrollTo(y, { immediate: true });
-    else lenis.scrollTo(y, { duration: 0.9, easing: (t) => 1 - Math.pow(2, -10 * t) });
+    if (pageScroll.current) pageScroll.current.scrollTo(y, { immediate: true });
+    else window.scrollTo(0, y);
+    // Directly too: if the scroll was already there (a drag held past either
+    // end), nothing else would bring the cards back.
+    control.current?.setProgress(progress);
   };
 
   // The floating screenshot. The carousel is a canvas, so it reports which
