@@ -1,0 +1,522 @@
+{
+  "spectra-web": {
+    "cover": {
+      "src": "/projects/spectra-web/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/spectra-web/01.webp",
+        "width": 1881,
+        "height": 883
+      },
+      {
+        "src": "/projects/spectra-web/02.webp",
+        "width": 1879,
+        "height": 882
+      },
+      {
+        "src": "/projects/spectra-web/03.webp",
+        "width": 1879,
+        "height": 875
+      },
+      {
+        "src": "/projects/spectra-web/04.webp",
+        "width": 1877,
+        "height": 880
+      },
+      {
+        "src": "/projects/spectra-web/05.webp",
+        "width": 1877,
+        "height": 882
+      },
+      {
+        "src": "/projects/spectra-web/06.webp",
+        "width": 1882,
+        "height": 883
+      },
+      {
+        "src": "/projects/spectra-web/07.webp",
+        "width": 1878,
+        "height": 880
+      },
+      {
+        "src": "/projects/spectra-web/08.webp",
+        "width": 1878,
+        "height": 876
+      }
+    ]
+  },
+  "spectra-mobile": {
+    "cover": {
+      "src": "/projects/spectra-mobile/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/spectra-mobile/01.webp",
+        "width": 960,
+        "height": 1920
+      },
+      {
+        "src": "/projects/spectra-mobile/02.webp",
+        "width": 960,
+        "height": 1920
+      },
+      {
+        "src": "/projects/spectra-mobile/03.webp",
+        "width": 960,
+        "height": 1920
+      },
+      {
+        "src": "/projects/spectra-mobile/04.webp",
+        "width": 720,
+        "height": 1612
+      },
+      {
+        "src": "/projects/spectra-mobile/05.webp",
+        "width": 720,
+        "height": 1612
+      }
+    ]
+  },
+  "e-ledger": {
+    "cover": {
+      "src": "/projects/e-ledger/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/e-ledger/01.webp",
+        "width": 1879,
+        "height": 883
+      },
+      {
+        "src": "/projects/e-ledger/02.webp",
+        "width": 1234,
+        "height": 573
+      },
+      {
+        "src": "/projects/e-ledger/03.webp",
+        "width": 1887,
+        "height": 888
+      },
+      {
+        "src": "/projects/e-ledger/04.webp",
+        "width": 1884,
+        "height": 882
+      }
+    ]
+  },
+  "emas-app": {
+    "cover": {
+      "src": "/projects/emas-app/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/emas-app/01.webp",
+        "width": 1876,
+        "height": 864
+      },
+      {
+        "src": "/projects/emas-app/02.webp",
+        "width": 1875,
+        "height": 880
+      },
+      {
+        "src": "/projects/emas-app/03.webp",
+        "width": 1883,
+        "height": 881
+      },
+      {
+        "src": "/projects/emas-app/04.webp",
+        "width": 1881,
+        "height": 874
+      }
+    ]
+  },
+  "disco-frog-studio": {
+    "cover": {
+      "src": "/projects/disco-frog-studio/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/disco-frog-studio/01.webp",
+        "width": 1889,
+        "height": 883
+      },
+      {
+        "src": "/projects/disco-frog-studio/02.webp",
+        "width": 1887,
+        "height": 878
+      },
+      {
+        "src": "/projects/disco-frog-studio/03.webp",
+        "width": 1883,
+        "height": 881
+      },
+      {
+        "src": "/projects/disco-frog-studio/04.webp",
+        "width": 1890,
+        "height": 880
+      },
+      {
+        "src": "/projects/disco-frog-studio/05.webp",
+        "width": 1885,
+        "height": 885
+      },
+      {
+        "src": "/projects/disco-frog-studio/06.webp",
+        "width": 1889,
+        "height": 883
+      },
+      {
+        "src": "/projects/disco-frog-studio/07.webp",
+        "width": 1903,
+        "height": 877
+      },
+      {
+        "src": "/projects/disco-frog-studio/08.webp",
+        "width": 1885,
+        "height": 882
+      }
+    ]
+  },
+  "lestari-osean-indonesia": {
+    "cover": {
+      "src": "/projects/lestari-osean-indonesia/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/lestari-osean-indonesia/01.webp",
+        "width": 1881,
+        "height": 885
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/02.webp",
+        "width": 1879,
+        "height": 880
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/03.webp",
+        "width": 1879,
+        "height": 880
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/04.webp",
+        "width": 1876,
+        "height": 878
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/05.webp",
+        "width": 1881,
+        "height": 879
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/06.webp",
+        "width": 1877,
+        "height": 875
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/07.webp",
+        "width": 1873,
+        "height": 863
+      },
+      {
+        "src": "/projects/lestari-osean-indonesia/08.webp",
+        "width": 1876,
+        "height": 868
+      }
+    ]
+  },
+  "bintang-manunggal-pratama": {
+    "cover": {
+      "src": "/projects/bintang-manunggal-pratama/cover.webp",
+      "width": 1080,
+      "height": 1080
+    },
+    "gallery": [
+      {
+        "src": "/projects/bintang-manunggal-pratama/01.webp",
+        "width": 1880,
+        "height": 878
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/02.webp",
+        "width": 1880,
+        "height": 873
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/03.webp",
+        "width": 1876,
+        "height": 879
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/04.webp",
+        "width": 1878,
+        "height": 882
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/05.webp",
+        "width": 1876,
+        "height": 845
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/06.webp",
+        "width": 1879,
+        "height": 859
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/07.webp",
+        "width": 1878,
+        "height": 880
+      },
+      {
+        "src": "/projects/bintang-manunggal-pratama/08.webp",
+        "width": 1878,
+        "height": 875
+      }
+    ]
+  },
+  "manwa": {
+    "cover": {
+      "src": "/projects/manwa/cover.webp",
+      "width": 450,
+      "height": 400
+    },
+    "gallery": [
+      {
+        "src": "/projects/manwa/01.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/manwa/02.webp",
+        "width": 1366,
+        "height": 656
+      },
+      {
+        "src": "/projects/manwa/03.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/manwa/04.webp",
+        "width": 1366,
+        "height": 656
+      },
+      {
+        "src": "/projects/manwa/05.webp",
+        "width": 1366,
+        "height": 658
+      },
+      {
+        "src": "/projects/manwa/06.webp",
+        "width": 1366,
+        "height": 656
+      },
+      {
+        "src": "/projects/manwa/07.webp",
+        "width": 1366,
+        "height": 658
+      },
+      {
+        "src": "/projects/manwa/08.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/manwa/09.webp",
+        "width": 1366,
+        "height": 653
+      },
+      {
+        "src": "/projects/manwa/10.webp",
+        "width": 354,
+        "height": 705
+      }
+    ]
+  },
+  "kelontong-id": {
+    "cover": {
+      "src": "/projects/kelontong-id/cover.webp",
+      "width": 450,
+      "height": 400
+    },
+    "gallery": [
+      {
+        "src": "/projects/kelontong-id/01.webp",
+        "width": 1366,
+        "height": 657
+      },
+      {
+        "src": "/projects/kelontong-id/02.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/kelontong-id/03.webp",
+        "width": 1366,
+        "height": 657
+      },
+      {
+        "src": "/projects/kelontong-id/04.webp",
+        "width": 1366,
+        "height": 658
+      },
+      {
+        "src": "/projects/kelontong-id/05.webp",
+        "width": 1366,
+        "height": 659
+      },
+      {
+        "src": "/projects/kelontong-id/06.webp",
+        "width": 1366,
+        "height": 658
+      },
+      {
+        "src": "/projects/kelontong-id/07.webp",
+        "width": 1366,
+        "height": 660
+      },
+      {
+        "src": "/projects/kelontong-id/08.webp",
+        "width": 1366,
+        "height": 658
+      },
+      {
+        "src": "/projects/kelontong-id/09.webp",
+        "width": 1366,
+        "height": 657
+      },
+      {
+        "src": "/projects/kelontong-id/10.webp",
+        "width": 1366,
+        "height": 659
+      },
+      {
+        "src": "/projects/kelontong-id/11.webp",
+        "width": 1366,
+        "height": 656
+      }
+    ]
+  },
+  "web-11": {
+    "cover": {
+      "src": "/projects/web-11/cover.webp",
+      "width": 450,
+      "height": 400
+    },
+    "gallery": [
+      {
+        "src": "/projects/web-11/01.webp",
+        "width": 1366,
+        "height": 658
+      },
+      {
+        "src": "/projects/web-11/02.webp",
+        "width": 1366,
+        "height": 657
+      },
+      {
+        "src": "/projects/web-11/03.webp",
+        "width": 1366,
+        "height": 656
+      },
+      {
+        "src": "/projects/web-11/04.webp",
+        "width": 1366,
+        "height": 655
+      },
+      {
+        "src": "/projects/web-11/05.webp",
+        "width": 1366,
+        "height": 656
+      },
+      {
+        "src": "/projects/web-11/06.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/web-11/07.webp",
+        "width": 1366,
+        "height": 652
+      },
+      {
+        "src": "/projects/web-11/08.webp",
+        "width": 1366,
+        "height": 651
+      },
+      {
+        "src": "/projects/web-11/09.webp",
+        "width": 1366,
+        "height": 650
+      },
+      {
+        "src": "/projects/web-11/10.webp",
+        "width": 1366,
+        "height": 655
+      },
+      {
+        "src": "/projects/web-11/11.webp",
+        "width": 1366,
+        "height": 653
+      },
+      {
+        "src": "/projects/web-11/12.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/web-11/13.webp",
+        "width": 1365,
+        "height": 644
+      },
+      {
+        "src": "/projects/web-11/14.webp",
+        "width": 1366,
+        "height": 653
+      },
+      {
+        "src": "/projects/web-11/15.webp",
+        "width": 1366,
+        "height": 652
+      },
+      {
+        "src": "/projects/web-11/16.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/web-11/17.webp",
+        "width": 1366,
+        "height": 653
+      },
+      {
+        "src": "/projects/web-11/18.webp",
+        "width": 1366,
+        "height": 654
+      },
+      {
+        "src": "/projects/web-11/19.webp",
+        "width": 1366,
+        "height": 651
+      },
+      {
+        "src": "/projects/web-11/20.webp",
+        "width": 1366,
+        "height": 651
+      }
+    ]
+  }
+}

@@ -1,26 +1,619 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Tokens taken from the "2026-porto" Figma file. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-ghost: var(--ghost);
+  --color-frame: var(--frame);
+  --color-panel: var(--panel);
+  --font-sans: var(--font-zalando);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --ghost: rgb(0 0 0 / 0.2);
+  --frame: #c6c6c6;
+  --panel: #f1f1f1;
+  --gutter: clamp(16px, 3vw, 44px);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-wipe: cubic-bezier(0.76, 0, 0.24, 1);
+  --page-duration: 900ms;
+}
+
+html,
+body {
+  overflow-x: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-zalando), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 4px;
+}
+
+/* Elements GSAP reveals start hidden once scripts are known to run. */
+.js [data-split],
+.js [data-reveal],
+.js [data-clip] {
+  visibility: hidden;
+}
+
+/* Split-text masks: extra room so tight display leading doesn't crop glyphs. */
+.split-line-mask {
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+@layer components {
+  .shell {
+    padding-inline: var(--gutter);
+  }
+
+  /* The big grey page word: 130px in a 1440 frame. */
+  .page-title {
+    font-size: clamp(3.5rem, 9vw, 8.125rem);
+    line-height: 0.8;
+    letter-spacing: -0.02em;
+    color: var(--ghost);
+  }
+
+  /* The grey square frame from the design: a 250px box with a 215px window. */
+  .frame {
+    --size: clamp(160px, min(17.4vw, 30svh), 250px);
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+    border: calc(var(--size) * 0.07) solid var(--frame);
+    background: var(--bg);
+    transition: border-color 300ms var(--ease-out);
+  }
+
+  .frame--sm {
+    --size: clamp(88px, 7.6vw, 120px);
+  }
+}
+
+/* ---------- Mouse follower ---------- */
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  mix-blend-mode: difference;
+}
+
+.cursor-disc {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  background: #fff;
+  scale: 0.14;
+  transition: scale 450ms var(--ease-out);
+}
+
+.cursor[data-mode="link"] .cursor-disc {
+  scale: 0.5;
+}
+
+/* With a label the disc turns solid, so the word stays legible over busy content. */
+.cursor[data-mode="label"] {
+  mix-blend-mode: normal;
+}
+
+.cursor[data-mode="label"] .cursor-disc {
+  scale: 1;
+  background: var(--fg);
+}
+
+.cursor.is-down .cursor-disc {
+  scale: 0.1;
+}
+
+.cursor[data-mode="link"].is-down .cursor-disc,
+.cursor[data-mode="label"].is-down .cursor-disc {
+  scale: 0.8;
+}
+
+.cursor-label {
+  color: var(--bg);
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 250ms;
+}
+
+.cursor[data-mode="label"] .cursor-label {
+  opacity: 1;
+  transition-delay: 120ms;
+}
+
+/* ---------- Rolling link text ---------- */
+
+.roll {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  line-height: 1.15;
+}
+
+.roll-inner {
+  position: relative;
+  display: inline-block;
+  transition: translate 550ms var(--ease-out);
+}
+
+.roll-inner::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  white-space: nowrap;
+}
+
+a:hover .roll-inner,
+a:focus-visible .roll-inner {
+  translate: 0 -100%;
+}
+
+/* ---------- Home ---------- */
+
+.carousel:hover .frame,
+.carousel:focus-visible .frame {
+  border-color: var(--fg);
+}
+
+/* ---------- Work ---------- */
+
+.project-card .frame-img {
+  transition: scale 700ms var(--ease-out);
+}
+
+.project-card:hover .frame,
+.project-card:focus-visible .frame {
+  border-color: var(--fg);
+}
+
+.project-card:hover .frame-img {
+  scale: 1.08;
+}
+
+.project-card h2 {
+  transition: translate 500ms var(--ease-out);
+}
+
+.project-card:hover h2 {
+  translate: 6px 0;
+}
+
+/* ---------- Project page ---------- */
+
+.btn-fill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.btn-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--frame);
+  translate: 0 101%;
+  transition: translate 500ms var(--ease-out);
+}
+
+.btn-fill:hover {
+  color: var(--fg);
+}
+
+.btn-fill:hover::before {
+  translate: 0 0;
+}
+
+.up-next-img {
+  transition: scale 900ms var(--ease-out);
+}
+
+.up-next:hover .up-next-img {
+  scale: 1.08;
+}
+
+/* ---------- About: the story ----------
+   Stacked by default (phones, reduced motion, no JS). On wide screens with
+   scripts the stage becomes one pinned screen: a 3D stack of the grey frames
+   sits in the middle and chapters are layered on top of each other, shown one
+   at a time around it. */
+
+.story {
+  --scene-w: clamp(280px, 30vw, 480px);
+  --plate: clamp(130px, 13.5vw, 220px);
+}
+
+.story-stage {
+  position: relative;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.story-scene {
+  display: none;
+}
+
+.story-chapter {
+  display: grid;
+  gap: 24px;
+  padding-block: 48px;
+}
+
+.story-chapter:first-of-type {
+  padding-top: 112px;
+}
+
+.story-title {
+  font-size: clamp(40px, 11vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.story-mask {
+  display: block;
+  overflow: clip;
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+}
+
+.story-body {
+  max-width: 40ch;
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.45;
+}
+
+.story-body + .story-body {
+  margin-top: 1em;
+}
+
+.story-progress {
+  display: none;
+}
+
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  .js .story-stage {
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  /* The frame stack: perspective on the scene, 3D all the way down. */
+  .js .story-scene {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    perspective: 1400px;
+    pointer-events: none;
+  }
+
+  .stack-tilt,
+  .stack,
+  .plate {
+    transform-style: preserve-3d;
+  }
+
+  .stack-tilt {
+    position: relative;
+    width: var(--plate);
+    height: var(--plate);
+  }
+
+  .stack {
+    position: absolute;
+    inset: 0;
+  }
+
+  .plate {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+  }
+
+  .plate-face {
+    position: absolute;
+    inset: 0;
+    border: calc(var(--plate) * 0.07) solid color-mix(in srgb, currentColor 22%, transparent);
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    transition: transform 500ms var(--ease-out), border-color 400ms var(--ease-out);
+  }
+
+  /* Hover lifts a plate off the stack and darkens its frame. */
+  .plate:hover .plate-face {
+    transform: translateZ(28px);
+    border-color: currentColor;
+  }
+
+  .plate-label {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    max-width: calc(100% - 16px);
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .plate-core {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 8px;
+    text-align: center;
+    font-size: clamp(22px, 2.4vw, 40px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .stack-packet {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    background: currentColor;
+    box-shadow: 0 0 18px currentColor;
+  }
+
+  .js .story-chapter {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    grid-template-columns: minmax(0, 1fr) var(--scene-w) minmax(0, 1fr);
+    column-gap: clamp(24px, 3vw, 56px);
+    align-items: center;
+    padding-block: 96px 120px;
+    pointer-events: none;
+  }
+
+  .js .story-chapter a {
+    pointer-events: auto;
+  }
+
+  .js .story-chapter:not(:first-of-type) {
+    visibility: hidden;
+  }
+
+  .js .story-left {
+    grid-column: 1;
+  }
+
+  .js .story-right {
+    grid-column: 3;
+  }
+
+  /* Sized so the longest word ("afternoon.") fits beside the stack. */
+  .js .story-title {
+    font-size: clamp(36px, 3.8vw, 72px);
+  }
+
+  .js .story-progress {
+    position: absolute;
+    right: 0;
+    bottom: 40px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .story-track {
+    width: 160px;
+    height: 1px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .story-bar {
+    display: block;
+    height: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}
+
+/* ---------- Contact ---------- */
+
+.social-tile {
+  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
+}
+
+.social-tile:hover,
+.social-tile:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* ---------- Project sheet (measured from Humaan's) ----------
+   --p runs 0 → 1 as the sheet scrolls from its resting spot up to the top of
+   the screen: the background widens from inset to full bleed, the top
+   corners square off, and the close button slides out to the screen corner. */
+
+html.sheet-open {
+  overflow: hidden;
+}
+
+.sheet {
+  --p: 0;
+  --sheet-x: clamp(8px, 2.1vw, 30px);
+  --sheet-top: clamp(88px, 22svh, 200px);
+  --sheet-radius: clamp(24px, 3.5vw, 50px);
+}
+
+.sheet-inner {
+  position: relative;
+  margin: var(--sheet-top) var(--sheet-x) 0;
+  min-height: calc(100svh - var(--sheet-top));
+}
+
+.sheet-bg {
+  position: absolute;
+  top: calc(var(--p) * var(--sheet-x) * -1);
+  right: calc(var(--p) * var(--sheet-x) * -1);
+  bottom: 0;
+  left: calc(var(--p) * var(--sheet-x) * -1);
+  border-radius: calc((1 - var(--p)) * var(--sheet-radius)) calc((1 - var(--p)) * var(--sheet-radius)) 0 0;
+  background: var(--bg);
+}
+
+/* Rests 45px inside the sheet's corner, then pins 15px from the screen's. */
+.sheet-close-rail {
+  position: sticky;
+  top: 15px;
+  z-index: 10;
+  height: 0;
+  margin-top: 45px;
+}
+
+.sheet-close {
+  position: absolute;
+  top: 0;
+  right: 45px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+  border-radius: 999px;
+  background: var(--bg);
+  translate: calc(var(--p) * (var(--sheet-x) + 30px)) 0;
+  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out), rotate 500ms var(--ease-out);
+}
+
+.sheet-close:hover,
+.sheet-close:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+  rotate: 90deg;
+}
+
+/* ---------- Page transitions ----------
+   The old page lifts away while the new one wipes up over it like a curtain
+   (down when going back). The header stays put, and the page word and the
+   project frames morph between pages as shared elements. */
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-group(.page-out-forward),
+::view-transition-group(.page-out-back) {
+  z-index: 1;
+}
+
+::view-transition-group(.page-in-forward),
+::view-transition-group(.page-in-back) {
+  z-index: 2;
+}
+
+::view-transition-old(.page-out-forward) {
+  animation: var(--page-duration) var(--ease-wipe) both page-lift-up;
+}
+
+::view-transition-new(.page-in-forward) {
+  animation: var(--page-duration) var(--ease-wipe) both page-wipe-up;
+}
+
+::view-transition-old(.page-out-back) {
+  animation: var(--page-duration) var(--ease-wipe) both page-lift-down;
+}
+
+::view-transition-new(.page-in-back) {
+  animation: var(--page-duration) var(--ease-wipe) both page-wipe-down;
+}
+
+@keyframes page-lift-up {
+  to { translate: 0 -14%; scale: 0.96; opacity: 0.4; }
+}
+
+@keyframes page-lift-down {
+  to { translate: 0 14%; scale: 0.96; opacity: 0.4; }
+}
+
+@keyframes page-wipe-up {
+  from { clip-path: inset(100% 0 0 0); translate: 0 18%; }
+  to { clip-path: inset(0); translate: 0 0; }
+}
+
+@keyframes page-wipe-down {
+  from { clip-path: inset(0 0 100% 0); translate: 0 -18%; }
+  to { clip-path: inset(0); translate: 0 0; }
+}
+
+::view-transition-group(.title-morph),
+::view-transition-group(.frame-morph) {
+  z-index: 3;
+  animation-duration: var(--page-duration);
+  animation-timing-function: var(--ease-wipe);
+}
+
+::view-transition-old(.title-morph),
+::view-transition-new(.title-morph) {
+  animation-duration: var(--page-duration);
+  animation-timing-function: var(--ease-wipe);
+}
+
+::view-transition-image-pair(.title-morph) {
+  animation: morph-blur var(--page-duration) var(--ease-wipe);
+}
+
+@keyframes morph-blur {
+  40% { filter: blur(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 1ms !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-image-pair(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }

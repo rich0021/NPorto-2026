@@ -1,69 +1,63 @@
-import Image from "next/image";
+import { profile } from "@/lib/content";
+import { PageMotion } from "./_components/page-motion";
+import { PageShell } from "./_components/page-shell";
+import { TitleMorph } from "./_components/page-title";
+import { ProjectCarousel } from "./_components/project-carousel";
 
+const small = "text-[clamp(14px,min(2.5vw,4svh),36px)] leading-none text-ghost";
+
+// Exactly one screen, never scrolls: "hi", the project carousel, and the name.
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <PageShell>
+      <PageMotion className="relative flex h-svh flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col items-center justify-center gap-[clamp(20px,3.3vw,48px)] pt-20">
+          <p
+            data-reveal
+            data-delay="0.1"
+            className="group cursor-default text-[clamp(24px,2.5vw,36px)] leading-none font-bold"
+          >
+            <span className="group-hover:hidden">hi</span>
+            <span className="hidden group-hover:inline" lang="id">
+              halo
+            </span>
           </p>
+          <div data-depth="-0.015">
+            <div data-reveal data-delay="0.25">
+              <ProjectCarousel />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <h1 className="home-name relative px-[clamp(8px,1.5vw,22px)]" data-depth="0.008">
+          <span className="sr-only">{profile.fullName}</span>
+
+          <span
+            aria-hidden="true"
+            data-reveal
+            data-delay="0.7"
+            className={`absolute top-[0.1em] left-[clamp(8px,1.5vw,22px)] flex gap-[1.4em] ${small}`}
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <span>im</span>
+            <span>{profile.middleName}</span>
+          </span>
+
+          <span aria-hidden="true" className="flex items-baseline gap-[clamp(12px,2.8vw,40px)]">
+            <TitleMorph>
+              <span
+                data-split="chars"
+                data-delay="0.15"
+                className="-ml-[0.04em] block text-[min(20.8vw,38svh)] leading-[0.8] tracking-[-0.02em] text-ghost"
+              >
+                {profile.firstName}
+              </span>
+            </TitleMorph>
+            <span data-reveal data-delay="0.8" className={small}>
+              {profile.lastName}
+            </span>
+          </span>
+        </h1>
+      </PageMotion>
+    </PageShell>
   );
 }
